@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Epochen-Quiz</title>
+<meta name="description" content="Bauwerke den Architekturepochen zuordnen. Lernquiz mit 15 Epochen und 76 Bauwerken.">
+<meta name="theme-color" content="#0b0d16">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237c5cff'/%3E%3Cstop offset='1' stop-color='%2300d4ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cpath d='M14 46h36M18 46V28h6v18M29 46V28h6v18M40 46V28h6v18M12 28L32 14l20 14z' fill='none' stroke='white' stroke-width='3.5' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg0: #0b0d16; --bg1: #141a2e;
+    --text: #f4f5fb; --muted: rgba(244,245,251,.62); --faint: rgba(244,245,251,.42);
+    --glass: rgba(255,255,255,.07); --glass-strong: rgba(255,255,255,.12); --glass-hover: rgba(255,255,255,.14);
+    --stroke: rgba(255,255,255,.14); --stroke-strong: rgba(255,255,255,.26);
+    --shadow: 0 24px 70px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.16);
+    --a1: #7c5cff; --a2: #00d4ff; --a3: #ff7a59;
+    --ok: #3ddc84; --ok-bg: rgba(61,220,132,.16); --bad: #ff5c6c; --bad-bg: rgba(255,92,108,.16);
+    --orb1: rgba(124,92,255,.55); --orb2: rgba(0,212,255,.42); --orb3: rgba(255,122,89,.40);
+    --chip: rgba(255,255,255,.08);
+    --radius: 28px;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg0: #eef0f7; --bg1: #f8f6ff;
+      --text: #15172a; --muted: rgba(21,23,42,.62); --faint: rgba(21,23,42,.42);
+      --glass: rgba(255,255,255,.55); --glass-strong: rgba(255,255,255,.72); --glass-hover: rgba(255,255,255,.85);
+      --stroke: rgba(255,255,255,.75); --stroke-strong: rgba(21,23,42,.14);
+      --shadow: 0 24px 70px rgba(40,40,90,.16), inset 0 1px 0 rgba(255,255,255,.9);
+      --ok: #1f9d55; --ok-bg: rgba(31,157,85,.14); --bad: #d93a4c; --bad-bg: rgba(217,58,76,.12);
+      --orb1: rgba(124,92,255,.35); --orb2: rgba(0,212,255,.30); --orb3: rgba(255,122,89,.28);
+      --chip: rgba(21,23,42,.06);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    min-height: 100vh; min-height: 100dvh; color: var(--text);
+    background: radial-gradient(120% 90% at 10% 0%, var(--bg1) 0%, var(--bg0) 55%), var(--bg0);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.45; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+  }
+  /* Hintergrund-Orbs */
+  .orbs { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+  .orb { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .9; will-change: transform; }
+  .orb.one { width: 55vmax; height: 55vmax; left: -15vmax; top: -20vmax; background: radial-gradient(circle, var(--orb1), transparent 70%); animation: drift1 26s ease-in-out infinite alternate; }
+  .orb.two { width: 50vmax; height: 50vmax; right: -18vmax; top: 10vh; background: radial-gradient(circle, var(--orb2), transparent 70%); animation: drift2 32s ease-in-out infinite alternate; }
+  .orb.three { width: 45vmax; height: 45vmax; left: 20vw; bottom: -25vmax; background: radial-gradient(circle, var(--orb3), transparent 70%); animation: drift3 38s ease-in-out infinite alternate; }
+  @keyframes drift1 { to { transform: translate(12vw, 10vh) scale(1.1); } }
+  @keyframes drift2 { to { transform: translate(-10vw, 14vh) scale(.95); } }
+  @keyframes drift3 { to { transform: translate(-8vw, -12vh) scale(1.08); } }
+
+  main { max-width: 760px; margin: 0 auto; padding: max(16px, env(safe-area-inset-top)) 16px 56px; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 4px 18px; }
+  .brand { display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; }
+  .logo { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, var(--a1), var(--a2)); display: grid; place-items: center; box-shadow: 0 8px 24px rgba(124,92,255,.35); flex: none; }
+  .logo svg { width: 24px; height: 24px; }
+  .brand h1 { font-size: 1.1rem; margin: 0; letter-spacing: -.01em; font-weight: 700; }
+  .brand small { display: block; color: var(--muted); font-weight: 500; font-size: .78rem; margin-top: 1px; }
+
+  .glass {
+    background: var(--glass); border: 1px solid var(--stroke); border-radius: var(--radius);
+    -webkit-backdrop-filter: blur(26px) saturate(170%); backdrop-filter: blur(26px) saturate(170%);
+    box-shadow: var(--shadow);
+  }
+  .card { padding: 22px; animation: rise .5s cubic-bezier(.2,.8,.2,1) both; }
+  .card + .card { margin-top: 16px; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: none; } }
+
+  button {
+    font: inherit; color: var(--text); cursor: pointer; border-radius: 16px; border: 1px solid var(--stroke);
+    background: var(--glass-strong); padding: 13px 16px; text-align: left; position: relative;
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    transition: transform .14s cubic-bezier(.2,.8,.2,1), background .18s, border-color .18s, box-shadow .18s, opacity .18s;
+  }
+  @media (hover:hover) { button:not(:disabled):hover { background: var(--glass-hover); border-color: var(--stroke-strong); transform: translateY(-1px); } }
+  button:not(:disabled):active { transform: scale(.98); }
+  button:focus-visible { outline: 2px solid var(--a2); outline-offset: 2px; }
+  button.primary { background: linear-gradient(135deg, var(--a1), var(--a2)); color: #fff; border-color: transparent; font-weight: 650; text-align: center; box-shadow: 0 10px 30px rgba(124,92,255,.35); }
+  button.ghost { background: transparent; border-color: transparent; color: var(--muted); padding: 8px 12px; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  button:disabled { cursor: default; }
+
+  /* Start */
+  .hero h2 { font-size: clamp(1.7rem, 5vw, 2.4rem); line-height: 1.1; margin: 4px 0 10px; letter-spacing: -.025em; font-weight: 800; }
+  .hero h2 span { background: linear-gradient(90deg, var(--a1), var(--a2) 60%, var(--a3)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p { color: var(--muted); margin: 0 0 18px; font-size: 1.02rem; max-width: 56ch; }
+  .modes { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .modes button { display: flex; flex-direction: column; gap: 4px; padding: 16px; border-radius: 20px; min-height: 96px; justify-content: flex-end; }
+  .modes button b { font-size: 1.05rem; font-weight: 700; }
+  .modes button span { color: var(--muted); font-size: .86rem; }
+  .modes button.primary span { color: rgba(255,255,255,.85); }
+  .modes button .n { position: absolute; top: 12px; right: 14px; font-size: .78rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: rgba(255,255,255,.14); color: inherit; }
+  .switch { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 16px; padding: 14px 16px; border-radius: 18px; background: var(--chip); border: 1px solid var(--stroke); }
+  .switch .l b { display: block; font-weight: 650; }
+  .switch .l span { color: var(--muted); font-size: .86rem; }
+  .toggle { width: 52px; height: 32px; border-radius: 999px; border: 0; padding: 0; background: rgba(120,120,140,.35); position: relative; flex: none; transition: background .2s; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .toggle::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.3); transition: transform .2s cubic-bezier(.2,.8,.2,1); }
+  .toggle[aria-checked="true"] { background: linear-gradient(135deg, var(--a1), var(--a2)); }
+  .toggle[aria-checked="true"]::after { transform: translateX(20px); }
+  .timeline { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; }
+  .timeline span { font-size: .78rem; padding: 5px 10px; border-radius: 999px; background: var(--chip); border: 1px solid var(--stroke); color: var(--muted); }
+
+  /* Quiz */
+  .meta { display: flex; justify-content: space-between; align-items: center; font-size: .86rem; color: var(--muted); font-weight: 500; }
+  .meta .pill { padding: 4px 10px; border-radius: 999px; background: var(--chip); border: 1px solid var(--stroke); color: var(--text); font-variant-numeric: tabular-nums; }
+  .progress { height: 5px; background: var(--chip); border-radius: 999px; overflow: hidden; margin: 12px 0 18px; }
+  .progress > div { height: 100%; width: 0; background: linear-gradient(90deg, var(--a1), var(--a2)); border-radius: 999px; transition: width .45s cubic-bezier(.2,.8,.2,1); }
+  .hero-img { position: relative; aspect-ratio: 16 / 10; border-radius: 20px; overflow: hidden; background: var(--chip); border: 1px solid var(--stroke); box-shadow: inset 0 1px 0 rgba(255,255,255,.2); }
+  .hero-img img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transform: scale(1.03); transition: opacity .5s ease, transform .9s cubic-bezier(.2,.8,.2,1); }
+  .hero-img img.loaded { opacity: 1; transform: none; }
+  .hero-img .shimmer { position: absolute; inset: 0; background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,.10) 50%, transparent 80%); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; }
+  @keyframes shimmer { from { background-position: 150% 0; } to { background-position: -50% 0; } }
+  .hero-img .kind { position: absolute; top: 12px; left: 12px; font-size: .74rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 5px 10px; border-radius: 999px; background: rgba(0,0,0,.45); color: #fff; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .hero-img .credit { position: absolute; right: 10px; bottom: 8px; font-size: .68rem; color: rgba(255,255,255,.75); text-decoration: none; padding: 3px 8px; border-radius: 999px; background: rgba(0,0,0,.35); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+  .hero-img.noimg img, .hero-img.noimg .shimmer { display: none; }
+  .hero-img.noimg::before { content: "Kein Bild verfügbar"; position: absolute; inset: 0; display: grid; place-items: center; color: var(--faint); font-size: .9rem; }
+  .building { margin: 16px 0 6px; min-height: 58px; }
+  .building .name { font-size: clamp(1.35rem, 4.2vw, 1.75rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
+  .building .sub { color: var(--muted); margin-top: 4px; font-size: .95rem; }
+  .building .arch { color: var(--muted); margin-top: 2px; font-size: .9rem; }
+  .building .hidden-note { color: var(--faint); font-size: .95rem; font-style: italic; }
+  .question { margin: 16px 0 12px; font-weight: 650; color: var(--muted); font-size: .95rem; text-transform: uppercase; letter-spacing: .06em; }
+  .options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  @media (max-width: 560px) { .options { grid-template-columns: repeat(2, 1fr); } }
+  .options button { padding: 12px 12px; font-weight: 600; font-size: .92rem; line-height: 1.25; border-radius: 14px; min-height: 48px; display: flex; align-items: center; }
+  .options button.correct { background: var(--ok-bg); border-color: var(--ok); box-shadow: 0 0 0 3px var(--ok-bg), 0 8px 24px rgba(61,220,132,.25); }
+  .options button.wrong { background: var(--bad-bg); border-color: var(--bad); animation: shake .4s ease; }
+  .options button.dim { opacity: .38; }
+  @keyframes shake { 0%,100% { transform: translateX(0);} 25% { transform: translateX(-4px);} 75% { transform: translateX(4px);} }
+
+  .feedback { margin-top: 18px; padding: 18px; border-radius: 20px; border: 1px solid var(--stroke); background: var(--glass-strong); animation: rise .4s cubic-bezier(.2,.8,.2,1) both; }
+  .feedback.ok { border-color: var(--ok); background: linear-gradient(180deg, var(--ok-bg), transparent 70%), var(--glass-strong); }
+  .feedback.bad { border-color: var(--bad); background: linear-gradient(180deg, var(--bad-bg), transparent 70%), var(--glass-strong); }
+  .feedback .verdict { font-weight: 800; font-size: 1.15rem; letter-spacing: -.01em; }
+  .feedback.ok .verdict { color: var(--ok); } .feedback.bad .verdict { color: var(--bad); }
+  .feedback .epoch { margin-top: 4px; font-weight: 650; }
+  .feedback .epoch small { color: var(--muted); font-weight: 500; }
+  .feedback .expl { margin-top: 8px; color: var(--text); font-size: .97rem; }
+  .feedback h4, .learn h4 { margin: 16px 0 8px; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font-size: .83rem; padding: 6px 11px; border-radius: 999px; background: var(--chip); border: 1px solid var(--stroke); color: var(--muted); line-height: 1.2; }
+  .chip.on { background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(0,212,255,.9)); color: #fff; border-color: transparent; font-weight: 600; box-shadow: 0 6px 16px rgba(124,92,255,.3); }
+  .chip.on::before { content: "✓ "; }
+  .chip.neutral { color: var(--text); }
+  .actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  .actions .primary { flex: 1; min-width: 180px; padding: 15px 18px; font-size: 1.02rem; }
+
+  /* Ergebnis */
+  .score { font-size: clamp(2.6rem, 9vw, 3.6rem); font-weight: 900; letter-spacing: -.04em; line-height: 1; margin: 10px 0 4px; background: linear-gradient(90deg, var(--a1), var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .list { margin: 14px 0 0; padding: 0; list-style: none; }
+  .list li { display: grid; grid-template-columns: 56px 1fr; gap: 12px; padding: 12px 0; border-top: 1px solid var(--stroke); font-size: .94rem; align-items: start; }
+  .list li:first-child { border-top: 0; }
+  .list img { width: 56px; height: 56px; object-fit: cover; border-radius: 12px; background: var(--chip); }
+  .list .b { font-weight: 700; }
+  .list .m { color: var(--muted); font-size: .86rem; }
+  .list .arch { color: var(--muted); font-size: .86rem; }
+  .list .wrongans { color: var(--bad); text-decoration: line-through; margin-right: 8px; }
+  .list .rightans { color: var(--ok); font-weight: 650; }
+  .list .chips { margin-top: 6px; }
+  .list .chip { font-size: .76rem; padding: 4px 9px; }
+
+  /* Lernen */
+  .learn .epoch-block { padding: 18px; border-radius: 22px; border: 1px solid var(--stroke); background: var(--glass); margin-top: 14px; }
+  .learn .epoch-block:first-child { margin-top: 0; }
+  .epoch-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .epoch-head h3 { margin: 0; font-size: 1.2rem; letter-spacing: -.015em; font-weight: 800; }
+  .epoch-head span { color: var(--muted); font-size: .86rem; font-weight: 600; }
+  .epoch-desc { color: var(--muted); font-size: .94rem; margin: 6px 0 0; }
+  .toc { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 4px; }
+  .toc a { font-size: .8rem; padding: 5px 10px; border-radius: 999px; background: var(--chip); border: 1px solid var(--stroke); color: var(--text); text-decoration: none; }
+  .hidden { display: none !important; }
+  footer { text-align: center; color: var(--faint); font-size: .78rem; margin-top: 28px; }
+  footer a { color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="orbs" aria-hidden="true"><div class="orb one"></div><div class="orb two"></div><div class="orb three"></div></div>
+<main>
+  <header>
+    <div class="brand" id="brand" role="button" tabindex="0" aria-label="Zur Startseite">
+      <div class="logo"><svg viewBox="0 0 64 64" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M14 48h36M18 48V30h6v18M29 48V30h6v18M40 48V30h6v18M12 30L32 16l20 14z"/></svg></div>
+      <h1>Epochen-Quiz <small>Architekturgeschichte für Rhea</small></h1>
+    </div>
+    <button class="ghost" id="btnHome">Start</button>
+  </header>
+
+  <!-- Start -->
+  <section id="viewStart" class="glass card hero">
+    <h2>Welches Bauwerk gehört <span>in welche Epoche?</span></h2>
+    <p id="introText"></p>
+    <div class="modes">
+      <button class="primary" data-mode="all"><span class="n" id="nAll"></span><b>Alles abfragen</b><span>Alle Bauwerke, gemischte Reihenfolge</span></button>
+      <button data-mode="quick"><span class="n">15</span><b>Schnellrunde</b><span>Zufällige Auswahl aus allen Epochen</span></button>
+      <button data-mode="learn"><span class="n" id="nEpochs"></span><b>Lernübersicht</b><span>Epochen, Merkmale und alle Bauwerke</span></button>
+    </div>
+    <div class="switch">
+      <div class="l"><b>Nur Bild zeigen</b><span>Name, Ort und Architekt erst nach der Antwort einblenden (schwerer)</span></div>
+      <button class="toggle" id="toggleHard" role="switch" aria-checked="false" aria-label="Nur Bild zeigen"></button>
+    </div>
+    <div class="timeline" id="timeline"></div>
+  </section>
+
+  <!-- Quiz -->
+  <section id="viewQuiz" class="glass card hidden">
+    <div class="meta"><span id="counter"></span><span class="pill" id="score"></span></div>
+    <div class="progress"><div id="bar"></div></div>
+    <div class="hero-img" id="heroImg">
+      <div class="shimmer"></div>
+      <img id="bImg" alt="">
+      <span class="kind hidden" id="bKind"></span>
+      <a class="credit" id="bCredit" target="_blank" rel="noopener" href="#">Bild: Wikimedia Commons</a>
+    </div>
+    <div class="building">
+      <div class="name" id="bName"></div>
+      <div class="sub" id="bPlace"></div>
+      <div class="arch" id="bArch"></div>
+    </div>
+    <div class="question">Welche Epoche?</div>
+    <div class="options" id="options"></div>
+    <div id="feedback" class="feedback hidden"></div>
+    <div class="actions"><button class="primary hidden" id="btnNext">Weiter</button></div>
+  </section>
+
+  <!-- Ergebnis -->
+  <section id="viewResult" class="glass card hidden">
+    <div class="meta"><span>Ergebnis</span></div>
+    <div class="score" id="resScore"></div>
+    <p id="resText" style="color:var(--muted);margin:6px 0 0"></p>
+    <div class="actions">
+      <button class="primary" id="btnAgain">Noch einmal</button>
+      <button id="btnRetryWrong">Nur die Fehler wiederholen</button>
+    </div>
+    <ul class="list" id="resList"></ul>
+  </section>
+
+  <!-- Lernen -->
+  <section id="viewLearn" class="glass card learn hidden">
+    <div class="meta"><span>Lernübersicht</span><span class="pill" id="learnCount"></span></div>
+    <div class="toc" id="toc"></div>
+    <div id="learnList"></div>
+    <div class="actions"><button class="primary" id="btnLearnQuiz">Quiz starten</button></div>
+  </section>
+
+  <footer>Bilder: Wikimedia Commons und Wikipedia, Lizenz jeweils auf der verlinkten Dateiseite. · <a href="https://github.com/KerobStudios/KunstRhea" target="_blank" rel="noopener">Quellcode</a></footer>
+</main>
+
+<script src="data.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+const shuffle = (a) => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+const ALL = EPOCHS.flatMap(e => e.buildings.map(b => ({ ...b, epoch: e.id })));
+const epochById = (id) => EPOCHS.find(e => e.id === id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// Bildquelle: Dateiseite aus der URL ableiten
+function creditUrl(img) {
+  if (!img) return "#";
+  try {
+    const u = new URL(img);
+    const parts = u.pathname.split("/");
+    const thumbIdx = parts.indexOf("thumb");
+    let file = thumbIdx >= 0 ? parts[thumbIdx + 3] : parts[parts.length - 1];
+    file = decodeURIComponent(file);
+    const wiki = parts[2]; // commons | de | en
+    if (wiki === "commons") return "https://commons.wikimedia.org/wiki/File:" + encodeURIComponent(file);
+    return `https://${wiki}.wikipedia.org/wiki/File:` + encodeURIComponent(file);
+  } catch { return "#"; }
+}
+
+let hardMode = false;
+try { hardMode = localStorage.getItem("epochen.hard") === "1"; } catch {}
+const tgl = $("toggleHard");
+tgl.setAttribute("aria-checked", String(hardMode));
+tgl.addEventListener("click", () => {
+  hardMode = !hardMode; tgl.setAttribute("aria-checked", String(hardMode));
+  try { localStorage.setItem("epochen.hard", hardMode ? "1" : "0"); } catch {}
+});
+
+function show(view) {
+  ["viewStart", "viewQuiz", "viewResult", "viewLearn"].forEach(v => $(v).classList.toggle("hidden", v !== view));
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// Start
+$("nAll").textContent = ALL.length;
+$("nEpochs").textContent = EPOCHS.length;
+$("introText").textContent = `${EPOCHS.length} Epochen, ${ALL.length} Bauwerke mit Bild, Architekt und Merkmalen. Zu jedem Bauwerk wählst du die Epoche und bekommst sofort die Erklärung.`;
+$("timeline").innerHTML = EPOCHS.map(e => `<span>${esc(e.short)} · ${esc(e.period)}</span>`).join("");
+
+// Quiz
+let queue = [], idx = 0, correct = 0, answers = [], locked = false;
+
+function startQuiz(items) {
+  queue = shuffle(items); idx = 0; correct = 0; answers = [];
+  show("viewQuiz"); render();
+}
+
+function chips(epoch, activeIdx, neutral = false) {
+  const set = new Set(activeIdx || []);
+  return `<div class="chips">${epoch.features.map((f, i) => `<span class="chip ${set.has(i) ? "on" : ""} ${neutral ? "neutral" : ""}">${esc(f)}</span>`).join("")}</div>`;
+}
+
+function setImage(el, src) {
+  const wrap = $("heroImg");
+  wrap.classList.remove("noimg");
+  el.classList.remove("loaded");
+  el.alt = "";
+  if (!src) { wrap.classList.add("noimg"); return; }
+  el.onload = () => el.classList.add("loaded");
+  el.onerror = () => wrap.classList.add("noimg");
+  el.src = src;
+  $("bCredit").href = creditUrl(src);
+}
+
+function showBuildingInfo(b, reveal) {
+  if (reveal) {
+    $("bName").textContent = b.name;
+    $("bPlace").textContent = `${b.place} · ${b.year}`;
+    $("bArch").textContent = b.architect ? `Architekt: ${b.architect}` : "";
+  } else {
+    $("bName").innerHTML = `<span class="hidden-note">Bauwerk verdeckt. Erkennst du die Epoche am Bild?</span>`;
+    $("bPlace").textContent = ""; $("bArch").textContent = "";
+  }
+}
+
+function render() {
+  const b = queue[idx];
+  locked = false;
+  $("counter").textContent = `Frage ${idx + 1} von ${queue.length}`;
+  $("score").textContent = `${correct} richtig`;
+  $("bar").style.width = `${(idx / queue.length) * 100}%`;
+  setImage($("bImg"), b.img);
+  $("bKind").classList.toggle("hidden", !b.kind);
+  $("bKind").textContent = b.kind || "";
+  showBuildingInfo(b, !hardMode);
+  $("feedback").className = "feedback hidden"; $("feedback").innerHTML = "";
+  $("btnNext").classList.add("hidden");
+  const opts = $("options"); opts.innerHTML = "";
+  EPOCHS.forEach(e => {
+    const btn = document.createElement("button");
+    btn.textContent = e.short; btn.dataset.epoch = e.id; btn.title = e.name;
+    btn.addEventListener("click", () => answer(e.id, btn));
+    opts.appendChild(btn);
+  });
+  // nächstes Bild vorladen
+  const nxt = queue[idx + 1]; if (nxt && nxt.img) { const p = new Image(); p.src = nxt.img; }
+}
+
+function answer(epochId, btn) {
+  if (locked) return; locked = true;
+  const b = queue[idx];
+  const ok = epochId === b.epoch;
+  if (ok) correct++;
+  answers.push({ b, chosen: epochId, ok });
+  [...$("options").children].forEach(o => {
+    o.disabled = true;
+    if (o.dataset.epoch === b.epoch) o.classList.add("correct");
+    else if (o === btn) o.classList.add("wrong");
+    else o.classList.add("dim");
+  });
+  showBuildingInfo(b, true);
+  const ep = epochById(b.epoch);
+  const fb = $("feedback");
+  fb.className = "feedback " + (ok ? "ok" : "bad");
+  fb.innerHTML = `
+    <div class="verdict">${ok ? "Richtig!" : "Leider nein."}</div>
+    <div class="epoch">${esc(ep.name)} <small>· ${esc(ep.period)}${b.style ? " · " + esc(b.style) : ""}</small></div>
+    <div class="expl">${esc(b.expl)}</div>
+    <h4>Merkmale der Epoche, hervorgehoben: trifft auf dieses Bauwerk zu</h4>
+    ${chips(ep, b.features)}`;
+  $("bar").style.width = `${((idx + 1) / queue.length) * 100}%`;
+  $("score").textContent = `${correct} richtig`;
+  const next = $("btnNext");
+  next.textContent = idx + 1 < queue.length ? "Weiter" : "Ergebnis anzeigen";
+  next.classList.remove("hidden");
+  setTimeout(() => next.scrollIntoView({ behavior: "smooth", block: "nearest" }), 50);
+}
+
+$("btnNext").addEventListener("click", () => { idx++; if (idx < queue.length) render(); else showResult(); });
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !$("viewQuiz").classList.contains("hidden") && !$("btnNext").classList.contains("hidden")) $("btnNext").click();
+});
+
+function showResult() {
+  show("viewResult");
+  const n = queue.length, pct = Math.round((correct / n) * 100);
+  $("resScore").textContent = `${correct} / ${n}`;
+  const text = pct === 100 ? "Perfekt. Alle Epochen sitzen." :
+               pct >= 80 ? "Sehr gut. Nur noch ein paar Wackler." :
+               pct >= 60 ? "Solide. Die Fehler unten noch einmal anschauen." :
+               "Da geht noch was. Lernübersicht ansehen und noch einmal probieren.";
+  $("resText").textContent = `${pct} % richtig. ${text}`;
+  const wrong = answers.filter(a => !a.ok);
+  $("btnRetryWrong").classList.toggle("hidden", wrong.length === 0);
+  $("resList").innerHTML = answers.map(a => {
+    const ep = epochById(a.b.epoch);
+    const ans = a.ok ? `<span class="rightans">${esc(ep.name)}</span>`
+                     : `<span class="wrongans">${esc(epochById(a.chosen).name)}</span><span class="rightans">${esc(ep.name)}</span>`;
+    return `<li><img src="${esc(a.b.img || "")}" alt="" loading="lazy"><div><div class="b">${esc(a.b.name)}</div><div class="m">${esc(a.b.place)} · ${esc(a.b.year)}</div><div class="arch">${esc(a.b.architect || "")}</div><div>${ans}</div></div></li>`;
+  }).join("");
+}
+
+$("btnAgain").addEventListener("click", () => startQuiz(queue));
+$("btnRetryWrong").addEventListener("click", () => startQuiz(answers.filter(a => !a.ok).map(a => a.b)));
+$("btnHome").addEventListener("click", () => show("viewStart"));
+$("brand").addEventListener("click", () => show("viewStart"));
+$("brand").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") show("viewStart"); });
+
+document.querySelectorAll("[data-mode]").forEach(btn => btn.addEventListener("click", () => {
+  const mode = btn.dataset.mode;
+  if (mode === "all") startQuiz(ALL);
+  else if (mode === "quick") startQuiz(shuffle(ALL).slice(0, 15));
+  else renderLearn();
+}));
+
+// Lernübersicht
+function renderLearn() {
+  $("learnCount").textContent = `${ALL.length} Bauwerke`;
+  $("toc").innerHTML = EPOCHS.map(e => `<a href="#ep-${e.id}">${esc(e.short)}</a>`).join("");
+  $("learnList").innerHTML = EPOCHS.map(e => `
+    <div class="epoch-block" id="ep-${e.id}">
+      <div class="epoch-head"><h3>${esc(e.name)}</h3><span>${esc(e.period)}</span></div>
+      <p class="epoch-desc">${esc(e.desc)}</p>
+      <h4>Merkmale</h4>
+      ${chips(e, [], true)}
+      <h4>Bauwerke</h4>
+      <ul class="list">${e.buildings.map(b => `
+        <li><img src="${esc(b.img || "")}" alt="" loading="lazy">
+          <div>
+            <div class="b">${esc(b.name)}${b.kind ? ` <span class="m">(${esc(b.kind)})</span>` : ""}</div>
+            <div class="m">${esc(b.place)} · ${esc(b.year)}${b.style ? " · " + esc(b.style) : ""}</div>
+            <div class="arch">${esc(b.architect || "")}</div>
+            <div class="m" style="margin-top:4px;color:var(--text)">${esc(b.expl)}</div>
+            <div class="chips">${b.features.map(i => `<span class="chip on">${esc(e.features[i])}</span>`).join("")}</div>
+          </div></li>`).join("")}
+      </ul>
+    </div>`).join("");
+  show("viewLearn");
+}
+$("btnLearnQuiz").addEventListener("click", () => startQuiz(ALL));
+</script>
+</body>
+</html>
